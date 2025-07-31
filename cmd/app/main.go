@@ -3,17 +3,16 @@ package main
 import (
 	"log"
 
+	"github.com/kirooha/kuber-practice/internal/app/handlers"
+
 	"github.com/gofiber/fiber/v2"
 )
-
-func listFilesHandler(fiberCtx *fiber.Ctx) error {
-	return fiberCtx.SendString("list of files")
-}
 
 func main() {
 	app := fiber.New()
 
-	app.Get("/files", listFilesHandler)
+	app.Get("/files", handlers.ListFilesHandler)
+	app.Post("/file", handlers.SaveFileHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }
