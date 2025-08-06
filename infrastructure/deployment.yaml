@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuber-practice-app
+  namespace: default
+  labels:
+    app: kuber-practice-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kuber-practice-app
+  template:
+    metadata:
+      labels:
+        app: kuber-practice-app
+    spec:
+      containers:
+        - image: eu.gcr.io/my-new-project-467616/kuber_practice_app:latest
+          name: kuber-practice-app
+          resources:
+            limits:
+              cpu: 50m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /files
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+            successThreshold: 1

@@ -1,0 +1,8 @@
+gcloud auth login
+gcloud auth configure-docker
+
+gcloud config set account gcpkir7ooha@gmail.com
+gcloud config set project my-new-project-467616
+
+gcloud container clusters get-credentials autopilot-cluster-1 --region europe-central2
+
