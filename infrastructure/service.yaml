@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuber-practice-app-service
+  labels:
+    app: kuber-practice-app
+  namespace: default
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: kuber-practice-app
+  type: ClusterIP
