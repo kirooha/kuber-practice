@@ -7,7 +7,23 @@ package dbmodel
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgconn"
 )
+
+const addFile = `-- name: AddFile :execresult
+INSERT INTO files(name, content)
+VALUES($1, $2)
+`
+
+type AddFileParams struct {
+	Name    string
+	Content string
+}
+
+func (q *Queries) AddFile(ctx context.Context, arg AddFileParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, addFile, arg.Name, arg.Content)
+}
 
 const listFiles = `-- name: ListFiles :many
 SELECT id, name, content, created_at, updated_at FROM files

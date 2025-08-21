@@ -1,0 +1,10 @@
+POST http://localhost:8080/file
+Accept: */*
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="file1.csv"
+Content-Type: text/csv
+
+< ./file1.csv
+--boundary--
