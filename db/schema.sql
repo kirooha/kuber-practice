@@ -110,6 +110,13 @@ ALTER TABLE ONLY public.goose_db_version
 
 
 --
+-- Name: files_uniq_name_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX files_uniq_name_idx ON public.files USING btree (name);
+
+
+--
 -- PostgreSQL database dump complete
 --
 

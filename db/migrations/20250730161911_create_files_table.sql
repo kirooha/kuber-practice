@@ -7,6 +7,8 @@ CREATE TABLE files(
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() at time zone 'utc'),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() at time zone 'utc')
 );
+
+CREATE UNIQUE INDEX files_uniq_name_idx ON files USING btree (name);
 -- +goose StatementEnd
 
 -- +goose Down
