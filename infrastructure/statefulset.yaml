@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kuber-practice-app-postgres
+spec:
+  serviceName: kuber-practice-app-postgres-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuber-practice-app-postgres
+  template:
+    metadata:
+      labels:
+        app: kuber-practice-app-postgres
+    spec:
+      containers:
+        - name: kuber-practice-app-postgres
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kuber-practice-app-secrets
+                  key: postgres_password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: kuber-practice-app-postgres-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: kuber-practice-app-postgres-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

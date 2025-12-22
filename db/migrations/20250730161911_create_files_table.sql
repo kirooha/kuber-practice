@@ -9,6 +9,11 @@ CREATE TABLE files(
 );
 
 CREATE UNIQUE INDEX files_uniq_name_idx ON files USING btree (name);
+
+CREATE TRIGGER update_files_updated_at BEFORE
+    UPDATE
+    ON files FOR EACH ROW EXECUTE PROCEDURE set_updated_at_column();
+
 -- +goose StatementEnd
 
 -- +goose Down

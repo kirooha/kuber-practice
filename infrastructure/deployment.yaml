@@ -35,9 +35,45 @@ spec:
           readinessProbe:
             httpGet:
               port: 8080
-              path: /files
+              path: /healthcheck
             initialDelaySeconds: 15
             periodSeconds: 20
             timeoutSeconds: 2
             failureThreshold: 3
             successThreshold: 1
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: kuber-practice-app-secrets
+                  key: api_key
+            - name: APP_DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: POSTGRES_USER
+            - name: APP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kuber-practice-app-secrets
+                  key: postgres_password
+            - name: APP_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: POSTGRES_HOST
+            - name: APP_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: POSTGRES_PORT
+            - name: APP_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: POSTGRES_DB
+            - name: APP_DB_MIGRATIONS_DIRECTORY
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: MIGRATIONS_DIRECTORY

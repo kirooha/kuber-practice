@@ -6,3 +6,4 @@ gcloud config set project my-new-project-467616
 
 gcloud container clusters get-credentials autopilot-cluster-1 --region europe-central2
 
+https://console.cloud.google.com/billing?organizationId=0

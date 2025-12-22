@@ -12,3 +12,16 @@ spec:
   selector:
     app: kuber-practice-app
   type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kuber-practice-app-postgres-service
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  clusterIP: None
+  selector:
+    app: kuber-practice-app-postgres

@@ -1,6 +1,7 @@
-POST http://localhost:8080/file
+POST http://localhost:9090/file
 Accept: */*
 Content-Type: multipart/form-data; boundary=boundary
+Authorization: local_api_key
 
 --boundary
 Content-Disposition: form-data; name="file"; filename="file1.csv"

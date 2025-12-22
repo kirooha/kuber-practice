@@ -12,19 +12,26 @@ import (
 
 type SaveHandler struct {
 	queries *dbmodel.Queries
+	apiKey  string
 }
 
-func NewSaveHandler(queries *dbmodel.Queries) *SaveHandler {
+func NewSaveHandler(queries *dbmodel.Queries, apiKey string) *SaveHandler {
 	return &SaveHandler{
 		queries: queries,
+		apiKey:  apiKey,
 	}
 }
 
 func (h *SaveHandler) Handle(fiberCtx *fiber.Ctx) error {
 	var (
-		ctx       = fiberCtx.Context()
-		msgPrefix = "app.handler.SaveHandler.Handle"
+		ctx          = fiberCtx.Context()
+		msgPrefix    = "app.handler.SaveHandler.Handle"
+		headerApiKey = fiberCtx.Get("Authorization")
 	)
+
+	if h.apiKey != headerApiKey {
+		return fiberCtx.SendStatus(http.StatusForbidden)
+	}
 
 	multipartForm, err := fiberCtx.MultipartForm()
 	if err != nil {

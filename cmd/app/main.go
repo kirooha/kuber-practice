@@ -2,22 +2,66 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/kirooha/kuber-practice/internal/app/handlers"
 	"github.com/kirooha/kuber-practice/internal/pkg/dbmodel"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5"
+	_ "github.com/lib/pq"
+	"github.com/pressly/goose/v3"
 )
 
 func main() {
-	ctx := context.Background()
+	var (
+		ctx = context.Background()
+	)
 
-	conn, err := pgx.Connect(ctx, "user=postgres dbname=kuber_practice sslmode=disable")
+	if os.Getenv("API_KEY") == "" {
+		log.Fatal("API_KEY must be set")
+	}
+	if os.Getenv("APP_DB_USER") == "" {
+		log.Fatal("APP_DB_USER must be set")
+	}
+	if os.Getenv("APP_DB_PASSWORD") == "" {
+		log.Fatal("APP_DB_PASSWORD must be set")
+	}
+	if os.Getenv("APP_DB_HOST") == "" {
+		log.Fatal("APP_DB_HOST must be set")
+	}
+	if os.Getenv("APP_DB_PORT") == "" {
+		log.Fatal("APP_DB_PORT must be set")
+	}
+	if os.Getenv("APP_DB_NAME") == "" {
+		log.Fatal("APP_DB_NAME must be set")
+	}
+	if os.Getenv("APP_DB_MIGRATIONS_DIRECTORY") == "" {
+		log.Fatal("APP_DB_MIGRATIONS_DIRECTORY must be set")
+	}
+
+	var (
+		dbUser             = os.Getenv("APP_DB_USER")
+		dbPassword         = os.Getenv("APP_DB_PASSWORD")
+		dbHost             = os.Getenv("APP_DB_HOST")
+		dbPort             = os.Getenv("APP_DB_PORT")
+		dbName             = os.Getenv("APP_DB_NAME")
+		dbMigrationsFolder = os.Getenv("APP_DB_MIGRATIONS_DIRECTORY")
+
+		apiKey = os.Getenv("API_KEY")
+	)
+
+	runMigrations(dbUser, dbPassword, dbHost, dbPort, dbName, dbMigrationsFolder)
+
+	conn, err := pgx.Connect(ctx, fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName))
 	if err != nil {
 		log.Fatalf("pgx.Connect error - %v", err)
 	}
+	defer conn.Close(ctx)
+
 	if err := conn.Ping(ctx); err != nil {
 		log.Fatalf("conn.Ping error - %v", err)
 	}
@@ -26,8 +70,33 @@ func main() {
 
 	app := fiber.New()
 
-	app.Get("/files", handlers.NewListHandler(queries).Handle)
-	app.Post("/file", handlers.NewSaveHandler(queries).Handle)
+	app.Get("/files", handlers.NewListHandler(queries, apiKey).Handle)
+	app.Get("/healthcheck", handlers.NewHealthcheckHandler().Handle)
+	app.Post("/file", handlers.NewSaveHandler(queries, apiKey).Handle)
 
 	log.Fatal(app.Listen(":8080"))
+}
+
+func runMigrations(dbUser, dbPassword, dbHost, dbPort, dbName, dbMigrationsFolder string) {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		dbUser, dbPassword, dbHost, dbPort, dbName,
+	)
+
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("sql.Open error - %v", err)
+	}
+	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		log.Fatalf("db.Ping error - %v", err)
+	}
+
+	if err := goose.SetDialect("postgres"); err != nil {
+		log.Fatalf("goose.SetDialect error - %v", err)
+	}
+	if err := goose.Up(db, dbMigrationsFolder); err != nil {
+		log.Fatalf("goose.Up error - %v", err)
+	}
 }

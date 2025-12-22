@@ -12,19 +12,26 @@ import (
 
 type ListHandler struct {
 	queries *dbmodel.Queries
+	apiKey  string
 }
 
-func NewListHandler(queries *dbmodel.Queries) *ListHandler {
+func NewListHandler(queries *dbmodel.Queries, apiKey string) *ListHandler {
 	return &ListHandler{
 		queries: queries,
+		apiKey:  apiKey,
 	}
 }
 
 func (h *ListHandler) Handle(fiberCtx *fiber.Ctx) error {
 	var (
-		ctx       = fiberCtx.Context()
-		msgPrefix = "app.handler.ListHandler.Handle"
+		ctx          = fiberCtx.Context()
+		msgPrefix    = "app.handler.ListHandler.Handle"
+		headerApiKey = fiberCtx.Get("Authorization")
 	)
+
+	if h.apiKey != headerApiKey {
+		return fiberCtx.SendStatus(http.StatusForbidden)
+	}
 
 	files, err := h.queries.ListFiles(ctx)
 	if err != nil {
