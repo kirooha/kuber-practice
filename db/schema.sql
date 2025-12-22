@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
+\restrict Uv4Aq7gD3M1XFIXEGw9tmbOcKoHM6A3gVOrqBRNPCNBgJ6Rb1LSZgQpUNTHy01e
+
 -- Dumped from database version 14.17 (Homebrew)
--- Dumped by pg_dump version 17.5
+-- Dumped by pg_dump version 18.0
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -117,6 +119,15 @@ CREATE UNIQUE INDEX files_uniq_name_idx ON public.files USING btree (name);
 
 
 --
+-- Name: files update_files_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_files_updated_at BEFORE UPDATE ON public.files FOR EACH ROW EXECUTE FUNCTION public.set_updated_at_column();
+
+
+--
 -- PostgreSQL database dump complete
 --
+
+\unrestrict Uv4Aq7gD3M1XFIXEGw9tmbOcKoHM6A3gVOrqBRNPCNBgJ6Rb1LSZgQpUNTHy01e
 
