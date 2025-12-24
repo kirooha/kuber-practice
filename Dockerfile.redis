@@ -9,10 +9,9 @@ ENV CGO_ENABLED=0
 ENV GOOS=linux
 ENV GOARCH=amd64
 
-COPY ./cmd/app ./cmd/app
-COPY ./db ./db
+COPY ./cmd/redis ./cmd/redis
 COPY ./internal ./internal
 
-RUN go build -v -o /app/main /app/cmd/app/main.go
+RUN go build -v -o /app/main /app/cmd/redis/main.go
 
 CMD ["/app/main"]

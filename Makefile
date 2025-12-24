@@ -21,6 +21,8 @@ sqlc:
 docker:
 	docker build -t eu.gcr.io/my-new-project-467616/kuber_practice_app:latest .
 	docker push eu.gcr.io/my-new-project-467616/kuber_practice_app:latest
+	docker build -f Dockerfile.redis -t eu.gcr.io/my-new-project-467616/kuber_practice_app_redis:latest .
+	docker push eu.gcr.io/my-new-project-467616/kuber_practice_app_redis:latest
 
 run:
 	docker run -it --rm --name kuber_practice_app_running_app eu.gcr.io/my-new-project-467616/kuber_practice_app:latest
