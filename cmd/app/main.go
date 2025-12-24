@@ -90,6 +90,7 @@ func main() {
 			DB:       0,
 		},
 	)
+	defer redisClient.Close()
 
 	_, err = redisClient.Ping(ctx).Result()
 	if err != nil {

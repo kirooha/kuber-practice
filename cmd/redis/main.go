@@ -71,6 +71,7 @@ func main() {
 			DB:       0,
 		},
 	)
+	defer redisClient.Close()
 
 	files, err := queries.ListFiles(ctx)
 	if err != nil {
