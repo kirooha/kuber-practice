@@ -28,6 +28,7 @@ func (q *Queries) AddFile(ctx context.Context, arg AddFileParams) (pgconn.Comman
 const listFiles = `-- name: ListFiles :many
 SELECT id, name, content, created_at, updated_at FROM files
 ORDER BY name
+LIMIT 2
 `
 
 func (q *Queries) ListFiles(ctx context.Context) ([]File, error) {

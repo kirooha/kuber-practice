@@ -2,23 +2,28 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/kirooha/kuber-practice/internal/pkg/dbmodel"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 )
 
 type ListHandler struct {
-	queries *dbmodel.Queries
-	apiKey  string
+	queries     *dbmodel.Queries
+	redisClient *redis.Client
+	apiKey      string
 }
 
-func NewListHandler(queries *dbmodel.Queries, apiKey string) *ListHandler {
+func NewListHandler(queries *dbmodel.Queries, redisClient *redis.Client, apiKey string) *ListHandler {
 	return &ListHandler{
-		queries: queries,
-		apiKey:  apiKey,
+		queries:     queries,
+		redisClient: redisClient,
+		apiKey:      apiKey,
 	}
 }
 
@@ -33,16 +38,12 @@ func (h *ListHandler) Handle(fiberCtx *fiber.Ctx) error {
 		return fiberCtx.SendStatus(http.StatusForbidden)
 	}
 
-	files, err := h.queries.ListFiles(ctx)
-	if err != nil {
-		log.Printf("%s: h.queries.ListFiles error - %v", msgPrefix, err)
+	value, err := h.redisClient.Get(ctx, "filenames").Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		log.Printf("%s: h.redisClient.Get error - %v", msgPrefix, err)
 		return fiberCtx.SendStatus(http.StatusInternalServerError)
 	}
-
-	var filenames []string
-	for _, file := range files {
-		filenames = append(filenames, file.Name)
-	}
+	filenames := strings.Split(value, ",")
 
 	return json.NewEncoder(fiberCtx.Response().BodyWriter()).Encode(filenames)
 }

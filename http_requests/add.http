@@ -9,3 +9,29 @@ Content-Type: text/csv
 
 < ./file1.csv
 --boundary--
+
+###
+POST http://localhost:9090/file
+Accept: */*
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: local_api_key
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="file2.csv"
+Content-Type: text/csv
+
+< ./file2.csv
+--boundary--
+
+###
+POST http://localhost:9090/file
+Accept: */*
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: local_api_key
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="file3.csv"
+Content-Type: text/csv
+
+< ./file3.csv
+--boundary--

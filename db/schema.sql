@@ -2,7 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict Uv4Aq7gD3M1XFIXEGw9tmbOcKoHM6A3gVOrqBRNPCNBgJ6Rb1LSZgQpUNTHy01e
 
 -- Dumped from database version 14.17 (Homebrew)
 -- Dumped by pg_dump version 18.0
@@ -129,5 +128,4 @@ CREATE TRIGGER update_files_updated_at BEFORE UPDATE ON public.files FOR EACH RO
 -- PostgreSQL database dump complete
 --
 
-\unrestrict Uv4Aq7gD3M1XFIXEGw9tmbOcKoHM6A3gVOrqBRNPCNBgJ6Rb1LSZgQpUNTHy01e
 

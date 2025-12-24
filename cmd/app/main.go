@@ -14,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -42,6 +43,9 @@ func main() {
 	if os.Getenv("APP_DB_MIGRATIONS_DIRECTORY") == "" {
 		log.Fatal("APP_DB_MIGRATIONS_DIRECTORY must be set")
 	}
+	if os.Getenv("APP_REDIS_HOST") == "" {
+		log.Fatal("APP_REDIS_HOST must be set")
+	}
 
 	var (
 		dbUser             = os.Getenv("APP_DB_USER")
@@ -50,6 +54,8 @@ func main() {
 		dbPort             = os.Getenv("APP_DB_PORT")
 		dbName             = os.Getenv("APP_DB_NAME")
 		dbMigrationsFolder = os.Getenv("APP_DB_MIGRATIONS_DIRECTORY")
+
+		redisHost = os.Getenv("APP_REDIS_HOST")
 
 		apiKey = os.Getenv("API_KEY")
 	)
@@ -68,13 +74,26 @@ func main() {
 
 	queries := dbmodel.New(conn)
 
+	redisClient := redis.NewClient(
+		&redis.Options{
+			Addr:     redisHost,
+			Password: "",
+			DB:       0,
+		},
+	)
+
+	_, err = redisClient.Ping(ctx).Result()
+	if err != nil {
+		log.Fatalf("redisClient.Ping().Result() error - %v", err)
+	}
+
 	app := fiber.New()
 
-	app.Get("/files", handlers.NewListHandler(queries, apiKey).Handle)
+	app.Get("/files", handlers.NewListHandler(queries, redisClient, apiKey).Handle)
 	app.Get("/healthcheck", handlers.NewHealthcheckHandler().Handle)
 	app.Post("/file", handlers.NewSaveHandler(queries, apiKey).Handle)
 
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(":9090"))
 }
 
 func runMigrations(dbUser, dbPassword, dbHost, dbPort, dbName, dbMigrationsFolder string) {
