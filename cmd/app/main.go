@@ -22,8 +22,11 @@ func main() {
 		ctx = context.Background()
 	)
 
-	if os.Getenv("API_KEY") == "" {
-		log.Fatal("API_KEY must be set")
+	if os.Getenv("APP_PORT") == "" {
+		log.Fatal("APP_PORT must be set")
+	}
+	if os.Getenv("APP_API_KEY") == "" {
+		log.Fatal("APP_API_KEY must be set")
 	}
 	if os.Getenv("APP_DB_USER") == "" {
 		log.Fatal("APP_DB_USER must be set")
@@ -46,6 +49,9 @@ func main() {
 	if os.Getenv("APP_REDIS_HOST") == "" {
 		log.Fatal("APP_REDIS_HOST must be set")
 	}
+	if os.Getenv("APP_REDIS_PASSWORD") == "" {
+		log.Fatal("APP_REDIS_PASSWORD must be set")
+	}
 
 	var (
 		dbUser             = os.Getenv("APP_DB_USER")
@@ -55,9 +61,12 @@ func main() {
 		dbName             = os.Getenv("APP_DB_NAME")
 		dbMigrationsFolder = os.Getenv("APP_DB_MIGRATIONS_DIRECTORY")
 
-		redisHost = os.Getenv("APP_REDIS_HOST")
+		redisHost     = os.Getenv("APP_REDIS_HOST")
+		redisPassword = os.Getenv("APP_REDIS_PASSWORD")
 
-		apiKey = os.Getenv("API_KEY")
+		apiKey = os.Getenv("APP_API_KEY")
+
+		port = os.Getenv("APP_PORT")
 	)
 
 	runMigrations(dbUser, dbPassword, dbHost, dbPort, dbName, dbMigrationsFolder)
@@ -77,7 +86,7 @@ func main() {
 	redisClient := redis.NewClient(
 		&redis.Options{
 			Addr:     redisHost,
-			Password: "",
+			Password: redisPassword,
 			DB:       0,
 		},
 	)
@@ -93,7 +102,7 @@ func main() {
 	app.Get("/healthcheck", handlers.NewHealthcheckHandler().Handle)
 	app.Post("/file", handlers.NewSaveHandler(queries, apiKey).Handle)
 
-	log.Fatal(app.Listen(":9090"))
+	log.Fatal(app.Listen(fmt.Sprintf(":%s", port)))
 }
 
 func runMigrations(dbUser, dbPassword, dbHost, dbPort, dbName, dbMigrationsFolder string) {

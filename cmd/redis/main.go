@@ -37,6 +37,9 @@ func main() {
 	if os.Getenv("APP_REDIS_HOST") == "" {
 		log.Fatal("APP_REDIS_HOST must be set")
 	}
+	if os.Getenv("APP_REDIS_PASSWORD") == "" {
+		log.Fatal("APP_REDIS_PASSWORD must be set")
+	}
 
 	var (
 		dbUser     = os.Getenv("APP_DB_USER")
@@ -45,7 +48,8 @@ func main() {
 		dbPort     = os.Getenv("APP_DB_PORT")
 		dbName     = os.Getenv("APP_DB_NAME")
 
-		redisHost = os.Getenv("APP_REDIS_HOST")
+		redisHost     = os.Getenv("APP_REDIS_HOST")
+		redisPassword = os.Getenv("APP_REDIS_PASSWORD")
 	)
 
 	conn, err := pgx.Connect(ctx, fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName))
@@ -63,7 +67,7 @@ func main() {
 	redisClient := redis.NewClient(
 		&redis.Options{
 			Addr:     redisHost,
-			Password: "",
+			Password: redisPassword,
 			DB:       0,
 		},
 	)

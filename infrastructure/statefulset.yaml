@@ -47,3 +47,42 @@ spec:
         resources:
           requests:
             storage: 1Gi
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kuber-practice-app-redis
+spec:
+  serviceName: kuber-practice-app-redis-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuber-practice-app-redis
+  template:
+    metadata:
+      labels:
+        app: kuber-practice-app-redis
+    spec:
+      containers:
+        - name: kuber-practice-app-redis
+          image: bitnami/redis:latest
+          ports:
+            - containerPort: 6379
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kuber-practice-app-secrets
+                  key: redis_password
+          volumeMounts:
+            - name: kuber-practice-app-redis-data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: kuber-practice-app-redis-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

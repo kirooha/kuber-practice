@@ -42,11 +42,16 @@ spec:
             failureThreshold: 3
             successThreshold: 1
           env:
-            - name: API_KEY
+            - name: APP_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: kuber-practice-app-secrets
                   key: api_key
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: PORT
             - name: APP_DB_USER
               valueFrom:
                 configMapKeyRef:
@@ -77,3 +82,13 @@ spec:
                 configMapKeyRef:
                   name: kuber-practice-app-service-config
                   key: MIGRATIONS_DIRECTORY
+            - name: APP_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: kuber-practice-app-service-config
+                  key: REDIS_HOST
+            - name: APP_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: kuber-practice-app-secrets
+                  key: redis_password

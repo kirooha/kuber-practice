@@ -3,8 +3,10 @@ kind: ConfigMap
 metadata:
   name: kuber-practice-app-service-config
 data:
+  PORT: "8080"
   POSTGRES_USER: "kuber_practice_user"
   POSTGRES_HOST: "kuber-practice-app-postgres-service"
   POSTGRES_PORT: "5432"
   POSTGRES_DB: "kuber_practice"
   MIGRATIONS_DIRECTORY: "/app/db/migrations"
+  REDIS_HOST: "kuber-practice-app-redis-service:6379"
